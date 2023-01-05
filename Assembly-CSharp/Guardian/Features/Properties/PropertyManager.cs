@@ -101,6 +101,14 @@ namespace Guardian.Features.Properties
         public Property<bool> ShowLog = new Property<bool>("Debug_ShowDebug", new string[0], true);
         public Property<bool> DrawDebugBackground = new Property<bool>("Debug_DrawBackground", new string[0], true);
 
+        // EXTENDED 
+        // Game
+        public Property<int> OTW_PointSpawns = new Property<int>("Game_OTWTitanSpawns", new string[0], 1);
+        public Property<int> OTW_PointProtectRadius = new Property<int>("Game_ProtectionRadius", new string[0], 10);
+        public Property<int> OTW_PointSpawnRadius = new Property<int>("Game_SpawnRadius", new string[0], 100);
+        public Property<int> OTW_PointCapturerNumber = new Property<int>("Game_CapturerNumber", new string[0], 1);
+        public Property<int> OTW_PointKillerNumber = new Property<int>("Game_KillerNumber", new string[0], 1);
+
         public override void Load()
         {
             // Gamemodes
