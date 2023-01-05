@@ -15,7 +15,7 @@ namespace Guardian
 {
     class GuardianClient : MonoBehaviour
     {
-        public static readonly string Build = "1.2.0";
+        public static readonly string Build = "1.2.0--0.0.1";
         public static readonly string RootDir = Application.dataPath + "\\..";
 
         public static readonly CommandManager Commands = new CommandManager();
@@ -77,60 +77,6 @@ namespace Guardian
 
             DiscordRPC.StartTime = GameHelper.CurrentTimeMillis();
             DiscordRPC.Initialize();
-
-            // Check for an update
-            StartCoroutine(CoCheckForUpdate());
-        }
-
-        private IEnumerator CoCheckForUpdate()
-        {
-            Logger.Info("Checking for update...");
-            Logger.Info($"Installed: {Build}");
-
-            using WWW www = new WWW("http://aottg.winnpixie.xyz/clients/guardian/version.txt?t=" + GameHelper.CurrentTimeMillis()); // Random long to try and avoid cache issues
-            yield return www;
-
-            if (www.error != null)
-            {
-                Logger.Error(www.error);
-
-                Logger.Error($"\nIf errors persist, PLEASE contact me!");
-                Logger.Info("Discord:");
-                Logger.Info($"\t- {"https://discord.gg/JGzTdWm".AsColor("0099FF")}");
-
-                try
-                {
-                    GameObject.Find("VERSION").GetComponent<UILabel>().text = "[FF0000]COULD NOT VERIFY BUILD.[-] If this persists, PLEASE contact me @ [0099FF]https://discord.gg/JGzTdWm[-]!";
-                }
-                catch { }
-            }
-            else
-            {
-                string latestBuild = "";
-                foreach (string buildData in www.text.Split('\n'))
-                {
-                    string[] buildInfo = buildData.Split(new char[] { '=' }, 2);
-                    if (!buildInfo[0].Equals("MOD")) continue;
-
-                    latestBuild = buildInfo[1].Trim();
-                }
-                Logger.Info("Latest: " + latestBuild);
-
-                if (!latestBuild.Equals(Build))
-                {
-                    Toasts.Add(new Toast("SYSTEM", "Your copy of Guardian is OUT OF DATE, please update!", 20));
-
-                    Logger.Info($"Your copy of Guardian is {"OUT OF DATE".AsBold().AsItalic().AsColor("FF0000")}!");
-                    Logger.Info("If you don't have the launcher, download it here:");
-                    Logger.Info($"\t- {"https://cb.run/GuardianAoT".AsColor("0099FF")}");
-
-                    try
-                    {
-                        GameObject.Find("VERSION").GetComponent<UILabel>().text = "[FF0000]OUT OF DATE![-] Please update from the launcher @ [0099FF]https://cb.run/GuardianAoT[-]!";
-                    }
-                    catch { }
-                }
-            }
         }
 
         private IEnumerator CoWaitAndSetParticleTexture()

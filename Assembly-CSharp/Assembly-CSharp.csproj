@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Assembly-CSharp</AssemblyName>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
@@ -16,6 +16,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutputPath>..\Guardian64\Guardian_Data\Managed\</OutputPath>
     <PlatformTarget>x64</PlatformTarget>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -49,6 +50,9 @@
     </Reference>
     <Reference Include="Photon3Unity3D">
       <HintPath>..\Guardian64\Guardian_Data\Managed\Photon3Unity3D.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleJSON">
+      <HintPath>..\Guardian64\Guardian_Data\Managed\SimpleJSON.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\Guardian64\Guardian_Data\Managed\UnityEngine.dll</HintPath>

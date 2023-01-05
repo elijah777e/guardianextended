@@ -8,8 +8,8 @@ namespace Guardian.UI.Impl
     class GuiModConfiguration : Gui
     {
         private Regex NumericPattern = new Regex("-?(\\d*\\.?)?\\d+", RegexOptions.IgnoreCase);
-        private int Width = 440;
-        private int Height = 320;
+        private int Width = 600;
+        private int Height = 900;
         private bool ShouldSave = false;
         private Dictionary<Property, bool> TempBoolProps = new Dictionary<Property, bool>();
         private Dictionary<Property, string> TempIntProps = new Dictionary<Property, string>();
