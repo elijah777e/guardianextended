@@ -103,11 +103,22 @@ namespace Guardian.Features.Properties
 
         // EXTENDED 
         // Game
-        public Property<int> OTW_PointSpawns = new Property<int>("Game_OTWTitanSpawns", new string[0], 1);
-        public Property<int> OTW_PointProtectRadius = new Property<int>("Game_ProtectionRadius", new string[0], 10);
-        public Property<int> OTW_PointSpawnRadius = new Property<int>("Game_SpawnRadius", new string[0], 100);
-        public Property<int> OTW_PointCapturerNumber = new Property<int>("Game_CapturerNumber", new string[0], 1);
-        public Property<int> OTW_PointKillerNumber = new Property<int>("Game_KillerNumber", new string[0], 1);
+        public Property<bool> OTW_EnableExtendedOptions = new Property<bool>("Extended_ExtendedOTW", new string[0], true);
+        public Property<int> OTW_SpawnCap = new Property<int>("Extended_SpawnCap", new string[0], 50);
+        public Property<int> OTW_SpawnInterval = new Property<int>("Extended_SpawnInterval", new string[0], 30);
+        public Property<int> OTW_CaptureMultiplier = new Property<int>("Extended_CaptureMultiplier", new string[0], 100);
+        public Property<int> OTW_HumanPoints = new Property<int>("Extended_HumanPoints", new string[0], 1000);
+        public Property<int> OTW_TitanPoints = new Property<int>("Extended_TitanPoints", new string[0], 1000);
+        public Property<int> OTW_PointSpawns = new Property<int>("Extended_NormalTitanSpawns", new string[0], 1);
+        public Property<int> OTW_PointProtectRadius = new Property<int>("Extended_ProtectionRadius", new string[0], 10);
+        public Property<int> OTW_PointSpawnRadius = new Property<int>("Extended_SpawnRadius", new string[0], 100);
+        public Property<int> OTW_PointCapturerChance = new Property<int>("Extended_CapturerChance", new string[0], 100);
+        public Property<int> OTW_PointCapturerNumber = new Property<int>("Extended_CapturerNumber", new string[0], 1);
+        public Property<int> OTW_PointKillerChance = new Property<int>("Extended_KillerChance", new string[0], 100);
+        public Property<int> OTW_PointKillerNumber = new Property<int>("Extended_KillerNumber", new string[0], 1);
+        public Property<int> OTW_PointRetakerChance = new Property<int>("Extended_RetakerChance", new string[0], 100);
+        public Property<int> OTW_PointRetakerNumber = new Property<int>("Extended_RetakerNumber", new string[0], 1);
+        public Property<int> OTW_PointRetakerDelay = new Property<int>("Extended_RetakerDelay", new string[0], 1);
 
         public override void Load()
         {
@@ -330,6 +341,24 @@ namespace Guardian.Features.Properties
             base.Add(MaxLogLines);
             base.Add(ShowLog);
             base.Add(DrawDebugBackground);
+
+            // Game
+            base.Add(OTW_EnableExtendedOptions);
+            base.Add(OTW_SpawnCap);
+            base.Add(OTW_SpawnInterval);
+            base.Add(OTW_CaptureMultiplier);
+            base.Add(OTW_HumanPoints);
+            base.Add(OTW_TitanPoints);
+            base.Add(OTW_PointSpawns);
+            base.Add(OTW_PointProtectRadius);
+            base.Add(OTW_PointSpawnRadius);
+            base.Add(OTW_PointCapturerChance);
+            base.Add(OTW_PointCapturerNumber);
+            base.Add(OTW_PointKillerChance);
+            base.Add(OTW_PointKillerNumber);
+            base.Add(OTW_PointRetakerChance);
+            base.Add(OTW_PointRetakerNumber);
+            base.Add(OTW_PointRetakerDelay);
 
             GuardianClient.Logger.Debug($"Registered {Elements.Count} properties.");
 

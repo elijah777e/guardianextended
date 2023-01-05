@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Guardian;
 
 public class FengGameManagerMKII : Photon.MonoBehaviour, Anarchy.Custom.Interfaces.IGameManager
 {
@@ -97,8 +98,8 @@ public class FengGameManagerMKII : Photon.MonoBehaviour, Anarchy.Custom.Interfac
     public int humanScore;
     public int PVPtitanScore;
     public int PVPhumanScore;
-    private int PVPtitanScoreMax = 200;
-    private int PVPhumanScoreMax = 200;
+    private int PVPtitanScoreMax = GuardianClient.Properties.OTW_TitanPoints.Value;
+    private int PVPhumanScoreMax = GuardianClient.Properties.OTW_HumanPoints.Value;
     private bool isWinning;
     private bool isLosing;
     private int teamWinner;
@@ -653,6 +654,7 @@ public class FengGameManagerMKII : Photon.MonoBehaviour, Anarchy.Custom.Interfac
 
     public GameObject SpawnTitanRaw(Vector3 position, Quaternion rotation)
     {
+        GuardianClient.Logger.Info($"Spawning another titan. We're at {Instance.AllTitans.Count} right now.");
         if (IN_GAME_MAIN_CAMERA.Gametype == GameType.Singleplayer)
         {
             return (GameObject)UnityEngine.Object.Instantiate(Resources.Load("TITAN_VER3.1"), position, rotation);
@@ -713,6 +715,7 @@ public class FengGameManagerMKII : Photon.MonoBehaviour, Anarchy.Custom.Interfac
         }
         GameObject gameObject2 = (IN_GAME_MAIN_CAMERA.Gametype != GameType.Singleplayer) ? PhotonNetwork.Instantiate("FX/FXtitanSpawn", gameObject.transform.position, Quaternion.Euler(-90f, 0f, 0f), 0) : ((GameObject)UnityEngine.Object.Instantiate(Resources.Load("FX/FXtitanSpawn"), gameObject.transform.position, Quaternion.Euler(-90f, 0f, 0f)));
         gameObject2.transform.localScale = gameObject.transform.localScale;
+        
         return gameObject;
     }
 
@@ -12548,5 +12551,38 @@ public class FengGameManagerMKII : Photon.MonoBehaviour, Anarchy.Custom.Interfac
         {
             EndGameRC();
         }
+    }
+
+    // EXTENDED 
+    public bool GroundCheck(Vector3 origin, out RaycastHit hit)
+    {
+        LayerMask groundMask = 1 << LayerMask.NameToLayer("Ground");
+        LayerMask enemyMask = 1 << LayerMask.NameToLayer("EnemyBox");
+        origin += new Vector3(0, 500, 0);
+        return Physics.Raycast(origin, -Vector3.up, out hit, 1000f, ((LayerMask)((int)enemyMask | (int)groundMask)).value);
+    }
+
+    public Vector3 GetTitanSpawnPoint(Vector3 pos, int rangeMin, int rangeMax)
+    {
+        float randomAngle = UnityEngine.Random.Range(0.0f, 360.0f) * Mathf.Deg2Rad;
+        float randomRange = UnityEngine.Random.Range(rangeMin, rangeMax);
+        Vector3 spawnPos = new Vector3(
+            pos.x + Mathf.Cos(randomAngle) * randomRange,
+            pos.y,
+            pos.z + Mathf.Sin(randomAngle) * randomRange
+        );
+        RaycastHit hit;
+        GroundCheck(spawnPos, out hit);
+        while (!GroundCheck(spawnPos, out hit))
+        {
+            randomAngle = UnityEngine.Random.Range(0.0f, 360.0f) * Mathf.Deg2Rad;
+            randomRange = UnityEngine.Random.Range(rangeMin, rangeMax);
+            spawnPos = new Vector3(
+                pos.x + Mathf.Cos(randomAngle) * randomRange,
+                pos.y,
+                pos.z + Mathf.Sin(randomAngle) * randomRange
+            ); // just keep doing that until we get a point far away enough
+        }
+        return hit.point;
     }
 }

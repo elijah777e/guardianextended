@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Guardian;
 
 public class PVPcheckPoint : Photon.MonoBehaviour
 {
@@ -111,16 +112,81 @@ public class PVPcheckPoint : Photon.MonoBehaviour
         Vector3 position = base.transform.position;
         Vector3 up = Vector3.up;
         Vector3 position2 = base.transform.position;
-        GameObject gameObject = fengGame.SpawnTitan(rate, position - up * (position2.y - GetHeight(base.transform.position)), base.transform.rotation);
-        if (FengGameManagerMKII.Level.Map == "The City I")
+        if (Guardian.GuardianClient.Properties.OTW_EnableExtendedOptions.Value == true)
         {
-            gameObject.GetComponent<TITAN>().chaseDistance = 120f;
+                // spawn normal titan
+            if (FengGameManagerMKII.Instance.AllTitans.Count < GuardianClient.Properties.OTW_SpawnCap.Value)
+            {
+                GameObject gameObject = fengGame.SpawnTitan(rate, position - up * (position2.y - GetHeight(base.transform.position)), base.transform.rotation);
+                if (FengGameManagerMKII.Level.Map == "The City I")
+                {
+                    gameObject.GetComponent<TITAN>().chaseDistance = 120f;
+                }
+                else
+                {
+                    gameObject.GetComponent<TITAN>().chaseDistance = 200f;
+                }
+                gameObject.GetComponent<TITAN>().PVPfromCheckPt = this;
+            }
+            // spawn extra normal titans 
+            for (int i = 1; i < Guardian.GuardianClient.Properties.OTW_PointSpawns.Value; i++)
+            {
+                if (FengGameManagerMKII.Instance.AllTitans.Count < GuardianClient.Properties.OTW_SpawnCap.Value)
+                {
+                    GameObject gameObject = fengGame.SpawnTitan(rate, fengGame.GetTitanSpawnPoint(position, GuardianClient.Properties.OTW_PointProtectRadius.Value, GuardianClient.Properties.OTW_PointSpawnRadius.Value), base.transform.rotation);
+                    if (FengGameManagerMKII.Level.Map == "The City I")
+                    {
+                        gameObject.GetComponent<TITAN>().chaseDistance = 120f;
+                    }
+                    else
+                    {
+                        gameObject.GetComponent<TITAN>().chaseDistance = 200f;
+                    }
+                    gameObject.GetComponent<TITAN>().PVPfromCheckPt = this;
+                }
+            }
+            // spawn capturer
+            if (UnityEngine.Random.Range(0,100) <= GuardianClient.Properties.OTW_PointCapturerChance.Value) 
+            {
+                for (int i = 1; i < Guardian.GuardianClient.Properties.OTW_PointCapturerNumber.Value; i++)
+                {
+                    if (FengGameManagerMKII.Instance.AllTitans.Count < GuardianClient.Properties.OTW_SpawnCap.Value)
+                    {
+                        GameObject gameObject = fengGame.SpawnTitan(rate, fengGame.GetTitanSpawnPoint(position, GuardianClient.Properties.OTW_PointProtectRadius.Value + 500, GuardianClient.Properties.OTW_PointSpawnRadius.Value + 500), base.transform.rotation);
+                        gameObject.GetComponent<TITAN>().chaseDistance = 10f;
+                        gameObject.GetComponent<TITAN>().PVPfromCheckPt = this;
+                        gameObject.GetComponent<TITAN>().SetAbnormalType2(TitanClass.Jumper, false);
+                    }
+                }
+            }
+            // spawn killer
+            if (UnityEngine.Random.Range(0, 100) <= GuardianClient.Properties.OTW_PointKillerChance.Value)
+            {
+                for (int i = 1; i < Guardian.GuardianClient.Properties.OTW_PointKillerNumber.Value; i++)
+                {
+                    if (FengGameManagerMKII.Instance.AllTitans.Count < GuardianClient.Properties.OTW_SpawnCap.Value)
+                    {
+                        GameObject gameObject = fengGame.SpawnTitanRaw(fengGame.GetTitanSpawnPoint(position, GuardianClient.Properties.OTW_PointProtectRadius.Value + 1000, GuardianClient.Properties.OTW_PointSpawnRadius.Value + 1000), base.transform.rotation);
+                        gameObject.GetComponent<TITAN>().chaseDistance = 9999f;
+                        gameObject.GetComponent<TITAN>().PVPfromCheckPt = this;
+                        gameObject.GetComponent<TITAN>().SetAbnormalType2(TitanClass.Crawler, true);
+                    }
+                }
+            }
         }
         else
         {
-            gameObject.GetComponent<TITAN>().chaseDistance = 200f;
+            GameObject gameObject = fengGame.SpawnTitan(rate, position - up * (position2.y - GetHeight(base.transform.position)), base.transform.rotation);
+            if (FengGameManagerMKII.Level.Map == "The City I")
+            {
+                gameObject.GetComponent<TITAN>().chaseDistance = 120f;
+            }
+            else
+            {
+                gameObject.GetComponent<TITAN>().chaseDistance = 200f;
+            }
+            gameObject.GetComponent<TITAN>().PVPfromCheckPt = this;
         }
-        gameObject.GetComponent<TITAN>().PVPfromCheckPt = this;
     }
 
     private float GetHeight(Vector3 pt)
@@ -219,19 +285,26 @@ public class PVPcheckPoint : Photon.MonoBehaviour
                     fengGame.CheckPvPPoints();
                 }
                 spawnTitanTimer += Time.deltaTime;
-                if (spawnTitanTimer > titanInterval)
+                if (spawnTitanTimer > GuardianClient.Properties.OTW_SpawnInterval.Value)
                 {
                     spawnTitanTimer = 0f;
-                    if (FengGameManagerMKII.Level.Map == "The City I")
+                    if (GuardianClient.Properties.OTW_EnableExtendedOptions.Value == true)
                     {
-                        if (FengGameManagerMKII.Instance.AllTitans.Count < 12)
+                        NewTitan();
+                    }
+                    else
+                    {
+                        if (FengGameManagerMKII.Level.Map == "The City I")
+                        {
+                            if (FengGameManagerMKII.Instance.AllTitans.Count < 12)
+                            {
+                                NewTitan();
+                            }
+                        }
+                        else if (FengGameManagerMKII.Instance.AllTitans.Count < 20)
                         {
                             NewTitan();
                         }
-                    }
-                    else if (FengGameManagerMKII.Instance.AllTitans.Count < 20)
-                    {
-                        NewTitan();
                     }
                 }
                 break;
@@ -319,7 +392,7 @@ public class PVPcheckPoint : Photon.MonoBehaviour
         }
         else
         {
-            humanPt += Time.deltaTime;
+            humanPt += Time.deltaTime * GuardianClient.Properties.OTW_CaptureMultiplier.Value / 100;
         }
     }
 
@@ -349,7 +422,8 @@ public class PVPcheckPoint : Photon.MonoBehaviour
                     Vector3 position = base.transform.position;
                     Vector3 up = Vector3.up;
                     Vector3 position2 = base.transform.position;
-                    PhotonNetwork.Instantiate("FEMALE_TITAN", position - up * (position2.y - GetHeight(base.transform.position)), base.transform.rotation, 0);
+                    GameObject FT = PhotonNetwork.Instantiate("FEMALE_TITAN", position - up * (position2.y - GetHeight(base.transform.position)), base.transform.rotation, 0);
+                    PhotonNetwork.Instantiate("FX/Thunder", position - up * (position2.y - GetHeight(base.transform.position)), base.transform.rotation, 0);
                 }
                 else
                 {
@@ -363,7 +437,7 @@ public class PVPcheckPoint : Photon.MonoBehaviour
         }
         else
         {
-            titanPt += Time.deltaTime;
+            titanPt += Time.deltaTime * GuardianClient.Properties.OTW_CaptureMultiplier.Value / 100;
         }
     }
 
